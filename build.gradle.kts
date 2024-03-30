@@ -4,6 +4,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.4"
 	id("jacoco")
 	id("org.sonarqube") version "4.4.1.3373"
+	
 }
 
 group = "com.adpro"
@@ -27,7 +28,7 @@ extra["springModulithVersion"] = "1.1.2"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("com.google.cloud.sql:postgres-socket-factory:1.0.16")
+	// implementation("com.google.cloud.sql:postgres-socket-factory:1.0.16")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-mustache")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -39,8 +40,11 @@ dependencies {
 	implementation("org.springframework.kafka:spring-kafka")
 	implementation("org.springframework.modulith:spring-modulith-starter-core")
 	implementation("org.springframework.modulith:spring-modulith-starter-jpa")
-	implementation("org.springframework.session:spring-session-jdbc")
+	//implementation("org.springframework.session:spring-session-jdbc")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+    implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
@@ -53,6 +57,7 @@ dependencies {
 	testImplementation("org.mockito:mockito-core")
 	testImplementation("org.junit.jupiter:junit-jupiter")
 	testImplementation("org.junit.jupiter:junit-jupiter-api")
+	testImplementation("junit:junit")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
@@ -77,7 +82,7 @@ tasks.withType<JacocoReport> {
   reports {
     xml.required.set(true)
     csv.required.set(true)
-    html.required.set(false)
+    html.required.set(true)
   }
 }
 
