@@ -28,7 +28,7 @@ public class JwtProvider {
         secretKey  = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         revokedTokens = ConcurrentHashMap.newKeySet();
         tokens = new ConcurrentHashMap<>();
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(12);
         scheduler.scheduleAtFixedRate(this::cleanUpExpiredTokens, 0, 1, TimeUnit.HOURS);
     }
 

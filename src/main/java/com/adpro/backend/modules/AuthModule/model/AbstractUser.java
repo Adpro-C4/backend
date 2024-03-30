@@ -19,7 +19,6 @@ public abstract class AbstractUser {
     private String username;
     private String password;
     private String email;
-
     private String role;
 
     public AbstractUser(String username, String password, String email, String role){

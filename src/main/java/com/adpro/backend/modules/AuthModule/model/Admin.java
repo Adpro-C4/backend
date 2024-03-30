@@ -2,6 +2,7 @@ package com.adpro.backend.modules.authmodule.model;
 
 import com.adpro.backend.modules.authmodule.enums.UserType;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ public class Admin extends AbstractUser {
     }
 
     public Admin() {
+        super();
         setRole(UserType.ADMIN.getUserType());
     }
 }

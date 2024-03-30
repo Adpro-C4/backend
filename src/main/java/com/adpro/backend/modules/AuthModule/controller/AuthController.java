@@ -14,17 +14,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Autowired
     private UserService<Admin> adminService;
 
@@ -42,34 +45,33 @@ public class AuthController {
     }
 
     @PostMapping("/login/customer")
-    public ResponseEntity<Object> loginCustomer(@RequestBody JsonNode requestBody) {
-        return login(requestBody, UserType.CUSTOMER);
+    public CompletableFuture<ResponseEntity<Object>> loginCustomer(@RequestBody JsonNode requestBody) {
+        return CompletableFuture.supplyAsync(() -> {
+            return login(requestBody, UserType.CUSTOMER);
+        }, threadPoolTaskExecutor);
     }
 
     public ResponseEntity<Object> login(JsonNode requestBody, UserType userType) {
         String username = requestBody.get("username").asText();
         String password = requestBody.get("password").asText();
-        System.out.println(username);
-        String role = userType.getUserType();
-        boolean isValidAuthenticated = userType.equals(UserType.ADMIN) ?
-                adminService.authenticateUser(username, password) :
-                customerService.authenticateUser(username, password);
-        if(!isValidAuthenticated){
-            return ResponseHandler.generateResponse("Maaf username atau password tidak sesuai", HttpStatus.UNAUTHORIZED, new HashMap<>());
-        }
-        return generateValidLoginResponse(username, role);
+        AbstractUser user = userType.equals(UserType.ADMIN)?
+                adminService.authenticateAndGetUser(username, password, Admin.class):
+                customerService.authenticateAndGetUser(username, password, Customer.class);
+        return generateLoginResponse(user);
     }
    
-    private ResponseEntity<Object> generateValidLoginResponse(String username, String role) {
+    private ResponseEntity<Object> generateLoginResponse(AbstractUser user) {
+            if(user == null){
+                return ResponseHandler.generateResponse("Maaf username atau password tidak sesuai", HttpStatus.UNAUTHORIZED, new HashMap<>());
+            }
             Map<String, Object> objectMap = new HashMap<>();
-            Object userData = role.equals(UserType.ADMIN.getUserType()) ? adminService.findByUsername(username) : customerService.findByUsername(username);;
+            Object userData = user.getRole().equals(UserType.ADMIN.getUserType()) ?
+                    (Admin) user : (Customer) user;
             objectMap.put("user", userData);
-            objectMap.put("token", generateJwtToken(username, role));
-    
+            objectMap.put("token", generateJwtToken(user.getUsername(), user.getRole()));
             HttpStatus status = HttpStatus.ACCEPTED;
-            String message = role.equals(UserType.ADMIN.getUserType()) ? "Login sebagai Admin berhasil" : "Login sebagai Customer berhasil";
+            String message = user.getRole().equals(UserType.ADMIN.getUserType()) ? "Login sebagai Admin berhasil" : "Login sebagai Customer berhasil";
             return ResponseHandler.generateResponse(message, status, objectMap);
-        
     }
 
     private String generateJwtToken(String username, String role) {
@@ -103,7 +105,6 @@ public class AuthController {
     }
     
     private <T extends AbstractUser> boolean validateUser(T user, String passwordConfirmation,  Map<String, Object> response) {
-        user.setPassword(user.getPassword());
         if (!user.isValid()) {
             response.put("message", "Field " + user.getRole().toLowerCase() + " tidak valid");
             return false;

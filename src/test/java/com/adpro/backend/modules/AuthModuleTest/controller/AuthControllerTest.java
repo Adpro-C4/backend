@@ -76,7 +76,7 @@ public class AuthControllerTest {
 
     @Test
     public void testLoginAdminSuccess() throws Exception {
-        when(adminService.authenticateUser(anyString(), anyString())).thenReturn(true);
+        when(adminService.authenticateAndGetUser("admin", "adminpass", Admin.class)).thenReturn(admin);
         when(adminService.findByUsername(anyString())).thenReturn(admin);
         JsonNode requestBody = createJsonNode("{\"username\":\"admin\",\"password\":\"adminpass\",\"role\":\"ADMIN\"}");
         ResponseEntity<Object> responseEntity = authController.login(requestBody, UserType.ADMIN);
@@ -92,7 +92,7 @@ public class AuthControllerTest {
 
     @Test
     public void testLoginCustomerSuccess() throws Exception {
-        when(customerService.authenticateUser(anyString(), anyString())).thenReturn(true);
+        when(customerService.authenticateAndGetUser("customer", "customerpass", Customer.class)).thenReturn(customer);
         when(customerService.findByUsername(anyString())).thenReturn(customer);
 
         JsonNode requestBody = createJsonNode("{\"username\":\"customer\",\"password\":\"customerpass\",\"role\":\"CUSTOMER\"}");
@@ -124,7 +124,7 @@ public class AuthControllerTest {
 
     @Test
     public void testRegisterAdminSuccess() throws Exception {
-        String passwordConfirmation = admin.getPassword();
+        String passwordConfirmation = "adminpass";
         when(adminService.addUser(any(Admin.class))).thenReturn(admin);
         RegistrationRequest<Admin> registrationRequest = new RegistrationRequest<>();
         registrationRequest.setUser(admin);
@@ -135,7 +135,7 @@ public class AuthControllerTest {
 
     @Test
     public void testRegisterCustomerSuccess() throws Exception {
-        String passwordConfirmation = customer.getPassword();
+        String passwordConfirmation = "customerpass";
         when(customerService.addUser(any(Customer.class))).thenReturn(customer);
         RegistrationRequest<Customer> registrationRequest = new RegistrationRequest<>();
         registrationRequest.setUser(customer);
