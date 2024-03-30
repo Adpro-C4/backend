@@ -33,21 +33,10 @@ public class CustomerTest {
     public void testCreateCustomer() {
         assertNotNull(customer);
         assertEquals("myusername", customer.getUsername());
-        assertEquals("mypassword", customer.getPassword());
         assertEquals("myemail@gmail.com", customer.getEmail());
         assertEquals("myname", customer.getName());
         assertEquals("myphonenumber", customer.getPhoneNumber());
         assertEquals(UserType.CUSTOMER.getUserType(), customer.getRole());
-    }
-
-    @Test
-    public void testAuthenticateSuccess() {
-        assertTrue(customer.authenticate("mypassword"));
-    }
-
-    @Test
-    public void testAuthenticateFailure() {
-        assertFalse(customer.authenticate("wrongpassword"));
     }
 
 }

@@ -1,25 +1,40 @@
 package com.adpro.backend.modules.authmodule.model;
 
-import lombok.AccessLevel;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.regex.Pattern;
 
+import com.adpro.backend.modules.authmodule.provider.AuthProvider;
+
 @Getter
 @Setter
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class AbstractUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
     private String username;
     private String password;
     private String email;
-    @Setter(AccessLevel.PRIVATE)
+
     private String role;
 
     public AbstractUser(String username, String password, String email, String role){
         this.username = username;
-        this.password = password;
+        setPassword(password);
         this.email = email;
         this.role = role;
+    }
+
+    public AbstractUser() {
+
+    }
+
+    public void setPassword(String password){
+        this.password = AuthProvider.getInstance().encode(password);
     }
 
     public boolean isValid(){
@@ -27,10 +42,6 @@ public abstract class AbstractUser {
                 isNotNullOrEmpty(getPassword()) &&
                 isNotNullOrEmpty(getEmail()) && isValidEmail(getEmail());
     };
-
-    public boolean authenticate(String password){
-        return this.password.equals(password);
-    }
 
     protected boolean isNotNullOrEmpty(String value) {
         return value != null && !value.isEmpty();

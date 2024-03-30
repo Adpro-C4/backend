@@ -30,18 +30,7 @@ public class AdminTest {
     public void testCreateAdmin() {
         assertNotNull(admin);
         assertEquals("myusername", admin.getUsername());
-        assertEquals("mypassword", admin.getPassword());
         assertEquals("myemail@gmail.com", admin.getEmail());
         assertEquals(UserType.ADMIN.getUserType(), admin.getRole());
-    }
-
-    @Test
-    public void testAuthenticateSuccess() {
-        assertTrue(admin.authenticate("mypassword"));
-    }
-
-    @Test
-    public void testAuthenticateFailure() {
-        assertFalse(admin.authenticate("wrongpassword"));
     }
 }

@@ -3,6 +3,7 @@ package com.adpro.backend.modules.authmodule.service;
 import java.util.List;
 
 import com.adpro.backend.modules.authmodule.model.AbstractUser;
+import com.adpro.backend.modules.authmodule.provider.AuthProvider;
 import com.adpro.backend.modules.authmodule.provider.JwtProvider;
 import com.adpro.backend.modules.authmodule.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,46 +26,55 @@ public class UserServiceImpl<T extends AbstractUser> extends UserService<T>{
 
     @Override
     public T updateUser(T user) {
-        if(user == null){
-            throw new NullPointerException();
+        verifyUserNotNull(user);
+        verifyUserExists(user.getUsername());
+        return  userRepository.save(user);
+    }
+
+    private void verifyUserNotNull(AbstractUser user) {
+        if (user == null) {
+            throw new IllegalArgumentException();
         }
-        if(userRepository.findByUsername(user.getUsername()) == null){
-            throw  new IllegalArgumentException();
+    }
+
+    private void verifyUserExists(String username) {
+        if (userRepository.findByUsername(username) == null) {
+            throw new IllegalArgumentException();
         }
-        return  userRepository.update(user);
+    }
+    private void verifyUserNotExists(String username) {
+        if (userRepository.findByUsername(username) != null) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private  void verifyUserIsValid(AbstractUser user) {
+        if (!user.isValid()) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
     public T addUser(T user) {
-        if(user == null){
-            throw new IllegalArgumentException();
-        }
-
-        if(!user.isValid()){
-            throw new IllegalArgumentException();
-        }
-
-        if(userRepository.findByUsername(user.getUsername())!= null){
-            throw  new IllegalArgumentException();
-        }
-        return  userRepository.add(user);
+        verifyUserNotNull(user);
+        verifyUserIsValid(user);
+        verifyUserNotExists(user.getUsername());
+        return  userRepository.save(user);
     }
 
     @Override
     public void removeUser(T user) {
-        if(userRepository.findByUsername(user.getUsername())== null){
-            throw  new NullPointerException();
-        }
-        userRepository.delete(user.getUsername());
+        verifyUserNotNull(user);
+        verifyUserExists(user.getUsername());
+        userRepository.deleteByUsername(user.getUsername());
     }
 
     @Override
     public boolean authenticateUser(String username, String password) {
         T user = userRepository.findByUsername(username);
-        if(user == null){
-            throw  new NullPointerException();
-        }
-        return userRepository.findByUsername(username).authenticate(password);
+        verifyUserNotNull(user);
+        verifyUserExists(user.getUsername());
+        return AuthProvider.getInstance().matches(password, user.getPassword());
     }
 
     @Override
@@ -85,10 +95,8 @@ public class UserServiceImpl<T extends AbstractUser> extends UserService<T>{
 
     @Override
     public void logout(AbstractUser user) {
-        T currUser = userRepository.findByUsername(user.getUsername());
-        if(currUser == null){
-            throw new IllegalArgumentException();
-        }
+        verifyUserNotNull(user);
+        verifyUserExists(user.getUsername());
         JwtProvider.getInstance().revokeJwtToken(JwtProvider.getInstance().getToken(user.getUsername()));
     }
     

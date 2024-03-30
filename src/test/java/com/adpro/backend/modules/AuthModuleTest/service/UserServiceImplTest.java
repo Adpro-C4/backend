@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.adpro.backend.modules.authmodule.provider.JwtProvider;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +18,6 @@ import com.adpro.backend.modules.authmodule.model.Admin;
 import com.adpro.backend.modules.authmodule.model.Customer;
 import com.adpro.backend.modules.authmodule.repository.UserRepository;
 import com.adpro.backend.modules.authmodule.service.UserServiceImpl;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -40,6 +39,18 @@ public class UserServiceImplTest {
     void setUp(){
         admin1 = new Admin("seorang_admin", "adminPass", "admin1@gmail.com");
         customer1 = new Customer("seorang_customer", "customerPass", "customer1@gmail.com", "nama customer", "0823561528");
+    }
+
+    @AfterEach
+    void tearDown(){
+        if(adminRepository.findByUsername(admin1.getUsername()) != null){
+            adminRepository.deleteByUsername(admin1.getUsername());
+        }
+
+        if(customerRepository.findByUsername(customer1.getUsername()) != null){
+            customerRepository.deleteByUsername(customer1.getUsername());
+        }
+
     }
     @Test
     public void testAuthenticateUserValid(){
@@ -67,8 +78,8 @@ public class UserServiceImplTest {
         when(adminRepository.findByUsername("seorang_admin")).thenReturn(null);
         when(customerRepository.findByUsername("seorang_customer")).thenReturn(null);
 
-        assertThrows(NullPointerException.class, () -> adminService.authenticateUser("seorang_admin", "adminPass"));
-        assertThrows(NullPointerException.class, () -> customerService.authenticateUser("seorang_customer", "customerPass"));
+        assertThrows(IllegalArgumentException.class, () -> adminService.authenticateUser("seorang_admin", "adminPass"));
+        assertThrows(IllegalArgumentException.class, () -> customerService.authenticateUser("seorang_customer", "customerPass"));
     }
 
     @Test
@@ -109,7 +120,7 @@ public class UserServiceImplTest {
     }
     @Test
     public void testLogoutUserExist(){
-        when(adminRepository.add((Admin) admin1)).thenReturn((Admin) admin1);
+        when(adminRepository.save((Admin) admin1)).thenReturn((Admin) admin1);
         adminService.addUser((Admin) admin1);
         when(adminRepository.findByUsername(admin1.getUsername())).thenReturn((Admin) admin1);
         String token = adminService.createJwtToken(admin1.getUsername());
@@ -137,7 +148,7 @@ public class UserServiceImplTest {
 
     @Test
     public void testAddUserUnique(){
-        when(customerRepository.add((Customer) customer1)).thenReturn((Customer) customer1);
+        when(customerRepository.save((Customer) customer1)).thenReturn((Customer) customer1);
         customerService.addUser((Customer) customer1);
         when(customerRepository.findByUsername(customer1.getUsername())).thenReturn((Customer) customer1);
         Customer getCustomer = customerService.findByUsername(customer1.getUsername());
@@ -146,7 +157,7 @@ public class UserServiceImplTest {
     };
     @Test
     public void testAddUserNotUnique() {
-        when(customerRepository.add((Customer) customer1)).thenReturn((Customer) customer1);
+        when(customerRepository.save((Customer) customer1)).thenReturn((Customer) customer1);
         customerService.addUser((Customer) customer1);
         when(customerRepository.findByUsername(customer1.getUsername())).thenReturn((Customer) customer1);
         assertThrows(IllegalArgumentException.class, () -> customerService.addUser((Customer) customer1));
@@ -179,7 +190,7 @@ public class UserServiceImplTest {
 
     @Test
     public void testRemoveUserNotExist(){
-        assertThrows(NullPointerException.class, () ->
+        assertThrows(IllegalArgumentException.class, () ->
                 customerService.removeUser((Customer) customer1));
     };
 
@@ -197,7 +208,7 @@ public class UserServiceImplTest {
 
     @Test
     public void testgetAllUserNotEmpty(){
-        when(customerRepository.add((Customer) customer1)).thenReturn((Customer) customer1);
+        when(customerRepository.save((Customer) customer1)).thenReturn((Customer) customer1);
         when(customerRepository.findAll()).thenReturn(List.of((Customer)customer1));
         customerService.addUser((Customer) customer1);
         assertEquals(1, customerService.getAllUsers().size());
@@ -212,7 +223,7 @@ public class UserServiceImplTest {
     public void testUpdateUserExist(){
         when(customerRepository.findByUsername(customer1.getUsername())).thenReturn((Customer) customer1);
 
-        when(customerRepository.update((Customer) customer1)).thenReturn((Customer) customer1);
+        when(customerRepository.save((Customer) customer1)).thenReturn((Customer) customer1);
         String newEmail = "emailbaru@gmail.com";
         customer1.setEmail(newEmail);
         customerService.updateUser((Customer) customer1);
@@ -230,7 +241,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserNull() {
 
-        assertThrows(NullPointerException.class, () -> customerService.updateUser(null));
+        assertThrows(IllegalArgumentException.class, () -> customerService.updateUser(null));
     }
 
 }
