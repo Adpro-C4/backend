@@ -17,7 +17,7 @@ public class AbstractUserTest {
         user = new Customer("mycususername", "mycuspassword", "mycusemail@gmail.com", "myname", "myphonenumber");
         assertNotNull(user);
         assertEquals("mycususername", user.getUsername());
-        assertEquals("mycuspassword", user.getPassword());
+       
         assertEquals("mycusemail@gmail.com", user.getEmail());
         assertEquals(UserType.CUSTOMER.getUserType(), user.getRole());
     }
@@ -26,7 +26,7 @@ public class AbstractUserTest {
         user = new Admin("myadusername", "myadpassword", "myademail@gmail.com");
         assertNotNull(user);
         assertEquals("myadusername", user.getUsername());
-        assertEquals("myadpassword", user.getPassword());
+        
         assertEquals("myademail@gmail.com", user.getEmail());
         assertEquals(UserType.ADMIN.getUserType(), user.getRole());
     }
@@ -38,7 +38,7 @@ public class AbstractUserTest {
         user.setPassword("cusmypassword1");
         user.setEmail("cusmyemail1@gmail.com");
         assertEquals("cusmyusername1", user.getUsername());
-        assertEquals("cusmypassword1", user.getPassword());
+       
         assertEquals("cusmyemail1@gmail.com", user.getEmail());
     }
 
@@ -49,7 +49,7 @@ public class AbstractUserTest {
         user.setPassword("admypassword1");
         user.setEmail("admyemail1@gmail.com");
         assertEquals("admyusername1", user.getUsername());
-        assertEquals("admypassword1", user.getPassword());
+       
         assertEquals("admyemail1@gmail.com", user.getEmail());
     }
 

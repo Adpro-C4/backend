@@ -27,8 +27,9 @@ repositories {
 extra["springModulithVersion"] = "1.1.2"
 
 dependencies {
+	implementation("org.yaml:snakeyaml:1.29")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	// implementation("com.google.cloud.sql:postgres-socket-factory:1.0.16")
+	implementation("com.github.javafaker:javafaker:1.0.2")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-mustache")
 	implementation("org.springframework.boot:spring-boot-starter-security")

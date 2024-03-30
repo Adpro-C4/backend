@@ -1,7 +1,6 @@
 package com.adpro.backend.modules.authmodule.model;
 
 import com.adpro.backend.modules.authmodule.enums.UserType;
-
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +19,7 @@ public class Customer extends AbstractUser {
     }
 
     public Customer() {
+        super();
         setRole(UserType.CUSTOMER.getUserType());
     }
 
