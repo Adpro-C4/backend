@@ -75,6 +75,12 @@ public class UserServiceImpl<T extends AbstractUser> extends UserService<T>{
     }
 
     @Override
+    public T getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+
+    @Override
     public boolean authenticateUser(String username, String password) {
         T user = userRepository.findByUsername(username);
         verifyUserNotNull(user);

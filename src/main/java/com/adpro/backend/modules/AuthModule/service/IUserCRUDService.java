@@ -10,5 +10,7 @@ public interface IUserCRUDService <T extends AbstractUser>{
     T updateUser(T user);
     T addUser(T user);
     void removeUser(T user);
+
+    T getUserById(Long id);
     
 }
