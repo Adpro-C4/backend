@@ -1,5 +1,6 @@
 package com.adpro.backend.modules.authmodule.controller;
 
+import com.adpro.backend.modules.authmodule.client.ShoppingCartClient;
 import com.adpro.backend.modules.authmodule.enums.UserType;
 import com.adpro.backend.modules.authmodule.model.AbstractUser;
 import com.adpro.backend.modules.authmodule.model.Admin;
@@ -20,8 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -105,7 +105,11 @@ public class AuthController {
         if (!validateUser(user, passwordConfirmation, response)) {
             return ResponseHandler.generateResponse((String) response.get("message"), HttpStatus.UNAUTHORIZED, response);
         }
-        saveUser(user, user.getRole());
+        AbstractUser nUser = saveUser(user, user.getRole());
+        if(nUser.getRole().equals(UserType.CUSTOMER.getUserType())){
+            ShoppingCartClient client = new ShoppingCartClient();
+            client.createShoppingCart(String.valueOf(nUser.getId()));
+        }
         response.put("message", "Berhasil mendaftarkan " + user.getRole());
         return ResponseHandler.generateResponse((String) response.get("message"), HttpStatus.ACCEPTED, response);
     }
@@ -122,11 +126,11 @@ public class AuthController {
         return true;
     }
     
-    private void saveUser(AbstractUser user, String userType) {
+    private AbstractUser saveUser(AbstractUser user, String userType) {
         if (userType.equals(UserType.CUSTOMER.getUserType())) {
-            customerService.addUser((Customer) user);
+            return customerService.addUser((Customer) user);
         } else {
-            adminService.addUser((Admin) user);
+            return adminService.addUser((Admin) user);
         }
     }
 
