@@ -1,4 +1,4 @@
-package com.adpro.backend.modules.AuthModuleTest.controller;
+package com.adpro.backend.modules.authmodule.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

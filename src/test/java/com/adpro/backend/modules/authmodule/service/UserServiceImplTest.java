@@ -1,4 +1,4 @@
-package com.adpro.backend.modules.AuthModuleTest.service;
+package com.adpro.backend.modules.authmodule.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
